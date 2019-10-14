@@ -84,7 +84,7 @@ resource "aws_security_group" "allow_all" {
 }
 
 resource "aws_instance" "default" {
-  ami                         = "ami-046eb59f650f0d233"
+  ami                         = "ami-0c975ab3f81803583"
   availability_zone           = "us-west-2b"
   instance_type               = "t2.micro"
   key_name                    = "sai"
