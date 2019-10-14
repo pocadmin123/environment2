@@ -91,7 +91,7 @@ resource "aws_instance" "default" {
   subnet_id                   = "${aws_subnet.subnet1-public.id}"
   vpc_security_group_ids      = ["${aws_security_group.allow_all.id}"]
   associate_public_ip_address = true
-  user_data = "${file("/var/lib/jenkins/workspace/automation/route.sh")}"
+  #user_data = "${file("/var/lib/jenkins/workspace/automation/route.sh")}"
   tags = {
     Name  = "Server-TF"
     Env   = "Prod"
@@ -120,3 +120,27 @@ resource "aws_instance" "default" {
 #       command = "sudo sh -c "iptables-save > /etc/iptables.rules"\n"
  # }
 }
+
+resource "null_resource" "remote" {
+ provisioner "remote-exec" {
+ connection {
+ type = "ssh"
+ host = "${aws_instance.default.public_ip}"
+
+     # host       =  "18.191.225.60"
+    user        = "ubuntu"
+    private_key = "${file("sai.pem")}"
+    agent       = false
+    timeout     = "30s"
+}
+
+   inline = [
+   "sudo mkdir /root/test",
+   "sudo chmod 777 /root/test/",
+   "sudo iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080",
+#   "sudo sh -c "iptables-save > /etc/iptables.rules"",
+   "sudo sh -c \"iptables-save > /etc/iptables.rules\"  "
+   ]
+  }
+}
+
